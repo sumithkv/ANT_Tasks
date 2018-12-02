@@ -1,0 +1,195 @@
+<?xml version="1.0"?>
+<project name="Ant-Tasks" default="main" basedir=".">
+	<!-- Sets variables which can later be used. -->
+	<!-- The value of a property is accessed via ${} -->
+	<property name="src.dir" location="src" />
+	<property name="build.dir" location="AntBin" />
+	<property name="dist.dir" location="AntJarDir" />
+	<property name="docs.dir" location="AntJavaDocs" />
+
+	<!-- Deletes the existing build, docs and dist directory-->
+	<target name="clean">
+		<delete dir="${build.dir}" />
+		<delete dir="${docs.dir}" />
+		<delete dir="${dist.dir}" />
+	</target>
+
+	<!-- Creates the  build, docs and dist directory-->
+	<target name="makedir">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${docs.dir}" />
+		<mkdir dir="${dist.dir}" />
+	</target>
+
+	<!-- Compiles the java code (including the usage of library for JUnit -->
+	<target name="compile" depends="clean, makedir">
+		<javac srcdir="${src.dir}" destdir="${build.dir}">
+		</javac>
+	</target>
+
+	<!-- Creates Javadoc -->
+	<target name="docs" depends="compile">
+		<javadoc packagenames="src" sourcepath="${src.dir}" destdir="${docs.dir}">
+			<fileset dir="${src.dir}">
+				<include name="**" />
+			</fileset>
+		</javadoc>
+	</target>
+
+	<!--Creates the deployable jar file  -->
+	<target name="jar" depends="compile">
+		<jar destfile="${dist.dir}\test.ant.jar" basedir="${build.dir}">
+			<manifest>
+				<attribute name="Main-Class" value="test.Main" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="main" depends="compile, jar, docs">
+		<echo message="Ant Learning Project" />
+		<description>Main target</description>
+	</target>
+
+	<!-- ********** TARGETS CREATED TO LEARN MORE ON ANT **********-->
+
+	<property name="owner" value="Sumith K.V" />
+	<property file="build.properties" />
+
+	<!-- Copying a File / Folder -->
+	<target name="copy">
+		<copy file="myfile.txt" tofile="mycopy.txt" />
+		<copy file="myfile.txt" todir="../some/other/dir" />
+		<copy todir="../new/dir">
+			<fileset dir="src_dir" />
+		</copy>
+		<copy todir="../dest/dir">
+			<fileset dir="src_dir">
+				<exclude name="**/*.java" />
+				<include name="**/*.txt" />
+			</fileset>
+		</copy>
+	</target>
+
+	<!-- Moving a File / Folder -->
+	<target name="move">
+		<move file="src/Test.java" tofile="src/TestCopy.java" />
+		<move file="src/Test.java" todir="archive" />
+	</target>
+
+
+	<!-- Zipping / Unzipping files -->
+	<target name="zips">
+		<zip destfile="output.zip" basedir="output" />
+		<unzip src="output.tar.gz" dest="extractDir" />
+	</target>
+
+	<!-- Replacing tokens in files -->
+	<target name="Replace Tokens">
+		<replace file="input.txt" token="old" value="new" />
+	</target>
+
+	<!-- Running EXE -->
+	<target name="ExecuteCMD">
+		<exec executable="cmd.exe">
+			<arg value="/c" />
+			<arg value="ant.bat" />
+			<arg value="-p" />
+		</exec>
+
+		<property name="browser" location="C:/Program Files/Internet Explorer/iexplore.exe" />
+		<property name="file" location="ant/docs/manual/index.html" />
+		<exec executable="${browser}" spawn="true">
+			<arg value="${file}" />
+		</exec>
+
+		<exec dir="M:\burnjc_view\ServiceTeams\Team 4\Report\CssValidation\bin" executable="cmd" os="Windows 7">
+			<arg line="/c cssvalFile.bat ${file1} ${file2}" />
+		</exec>
+	</target>
+
+	<!-- Creating WAR file -->
+	<target name="war">
+		<war destfile="fax.war" webxml="${web.dir}/web.xml">
+			<fileset dir="${web.dir}/WebContent">
+				<include name="**/*.*" />
+			</fileset>
+			<lib dir="thirdpartyjars">
+				<exclude name="portlet.jar" />
+			</lib>
+			<classes dir="${build.dir}/web" />
+		</war>
+	</target>
+
+	<!-- Executing JUnit Test -->
+	<target name="junit">
+		<junit haltonfailure="true" printsummary="true">
+			<test name="com.tutorialspoint.UtilsTest" />
+		</junit>
+	</target>
+
+	<!-- Create an ant file to run other ant files -->
+	<target name="MultipleAntFiles">
+		<ant antfile="antFile1" target="clean" />
+		<ant antfile="antFile2" target="install" />
+		<ant antfile="antFile3" target="deploy" />
+	</target>
+
+	<!-- Call ant target multiple times with different parameters -->
+	<target name="TestAntCall">
+		<antcall target="CallMe">
+			<param name="msg" value="Welcome" />
+		</antcall>
+		<antcall target="CallMe">
+			<param name="msg" value="Thank You" />
+		</antcall>
+		<antcall target="CallYou" />
+	</target>
+	<target name="CallMe">
+		<echo message="My Message is = ${msg}" />
+	</target>
+	<target name="CallYou">
+		<echo message="Good Morning ANT" />
+	</target>
+
+	<!-- Ant task to set System Environment Properties -->
+	<target name="SetWinEnv">
+		<property name="qa.home" value="C:/Users" />
+		<exec executable="cmd" failonerror="true">
+			<env key="SUMITH_HOME" value="${qa.home}/sumith.kv" />
+			<arg value="/c" />
+			<arg value="echo New Env Variable is Set to %SUMITH_HOME%" />
+		</exec>
+	</target>
+
+	<!-- Ant task for downloading a file -->
+	<target name="BuildDownload">
+		<get src="http://10.89.159.117/nexus/content/repositories/levels/com/tgcs/tcx/gravity/base-device/1.5-176/base-device-1.5-176.jar" dest="F:/Temp Docs" username="Administrator" password="Password@123" skipexisting="yes" />
+	</target>
+
+	<!-- Ant SCP task -->
+	<target name="SCP_Task">
+		<scp file="myfile.txt" todir="user@somehost:/home/chuck" sftp="true" password="password" />
+		<scp file="user:password@somehost:/home/chuck/myfile.txt" todir="../some/other/dir" />
+		<scp todir="user:password@somehost:/home/chuck">
+			<fileset dir="src_dir">
+				<include name="**/*.java" />
+			</fileset>
+		</scp>
+	</target>
+
+	<!-- Ant SSH task -->
+	<target name="SSH_Task">
+		<sshexec host="somehost" username="dude" password="yo" command="touch somefile" />
+	</target>
+
+	<!-- Executing Java Class file -->
+	<target name="JavaClass">
+		<java classname="test.PrintSystemEnvVariables">
+			<arg value="-h" />
+			<classpath>
+				<pathelement path="E:\My Docs\Workspace\MyStudy_Space\ApacheANT\bin" />
+			</classpath>
+		</java>
+	</target>
+
+</project>

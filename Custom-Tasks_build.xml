@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<project name="Ant-Custom-Tasks" default="main" basedir=".">
+
+	<target name="main" depends="JavaJar, CustomTasks">
+		<Sum op1="22" op2="77" />
+		<Sum op1="11" op2="33" />
+		<Sum op1="12" op2="21" />
+	</target>
+
+	<target name="CustomTasks">
+		<taskdef name="Sum" classpath="AntJarDir/customAntTasks.jar" classname="customAntTasks.FirstCustomAntTask" />
+	</target>
+
+	<target name="JavaJar">
+		<javac srcdir="src/customAntTasks" destdir="AntBin" />
+		<jar destfile="AntJarDir/customAntTasks.jar" basedir="AntBin" />
+	</target>
+	
+	
+	<!-- Only for interviews -->
+	
+
+</project>

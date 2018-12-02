@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<project name="Ant-Contrib-Tasks" default="main" basedir=".">
+
+	<target name="main" depends="Logical Tasks - FOR">
+		<echo message="Learning the tasks associated with Ant-Contrib JAR" />
+		<description>Main target for Ant-Contrib</description>
+	</target>
+
+	<target name="Logical Tasks - IF">
+		<if>
+			<equals arg1="${foo}" arg2="bar" />
+			<then>
+				<echo message="The value of property foo is 'bar'" />
+			</then>
+			<elseif>
+				<equals arg1="${foo}" arg2="foo" />
+				<then>
+					<echo message="The value of property foo is 'foo'" />
+				</then>
+			</elseif>
+			<else>
+				<echo message="The value of property foo is not 'foo' or 'bar'" />
+			</else>
+		</if>
+	</target>
+
+	<target name="Logical Tasks - FOR">
+		<for list="a,b,c,d,e" param="letter">
+			<sequential>
+				<echo>Letter @{letter}</echo>
+			</sequential>
+		</for>
+	</target>
+
+	<target name="Logical Tasks - SWITCH">
+		<switch value="${foo}">
+			<case value="bar">
+				<echo message="The value of property foo is bar" />
+			</case>
+			<case value="baz">
+				<echo message="The value of property foo is baz" />
+			</case>
+			<default>
+				<echo message="The value of property foo is not sensible" />
+			</default>
+		</switch>
+	</target>
+
+	<target name="Logical Tasks - TRY CATCH">
+		<trycatch property="foo" reference="bar">
+			<try>
+				<fail>Tada!</fail>
+			</try>
+			<catch>
+				<echo>In &lt;catch&gt;.</echo>
+			</catch>
+			<finally>
+				<echo>In &lt;finally&gt;.</echo>
+			</finally>
+		</trycatch>
+	</target>
+
+	<target name="SHELL Script">
+		<shellscript shell="sh" dir="${thirdparty.dist.dir}/lib">
+		          rm *.so
+		          for file in *.0
+		          do
+		            x=`echo $file | sed -e's/.0.1.0//'`
+		            ln -s $file $x
+		          done
+		        </shellscript>
+		<shellscript shell="bash" dir="${build.bin.dir}" inputstring="ls -rt | tail -n 1" outputproperty="last.bin.file" />
+	</target>
+
+	<target name="Maths">
+		<var name="op1" value="12" />
+		<var name="op2" value="6" />
+		<var name="op" value="+" />
+
+		<!-- demo plus -->
+		<math result="result" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int" />
+		<echo>${op1} ${op} ${op2} = ${result}</echo>
+		<assert name="result" value="18" />
+
+		<!-- demo multiply -->
+		<var name="op" value="*" />
+		<math result="result" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int" />
+		<echo>${op1} ${op} ${op2} = ${result}</echo>
+		<assert name="result" value="72" />
+
+		<!-- now calculate the area -->
+		<math result="area" precision="float">
+			<op type="*">
+				<num value="PI" />
+				<op type="pow">
+					<num value="${radius}" />
+					<num value="2" />
+				</op>
+			</op>
+		</math>
+		<echo>area = PI * radius ^ 2 = ${area}</echo>
+	</target>
+
+</project>
